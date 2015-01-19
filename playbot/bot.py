@@ -26,7 +26,8 @@ class PlayBot(irc.bot.SingleServerIRCBot):
 
     def on_nicknameinuse(self, c, e):
         self.log.info('Nick previously in use, recovering.')
-        c.nick(c.get_nickname() + "_")
+        self.nickname = c.get_nickname() + "_"
+        c.nick(self.nickname)
         time.sleep(1)
         self.log.info('Nick previously in use, recovered.')
 
@@ -37,21 +38,36 @@ class PlayBot(irc.bot.SingleServerIRCBot):
             time.sleep(0.5)
 
     def on_privmsg(self, c, e):
-        self.do_command(e, e.arguments[0], *e.arguments[1:])
+        e.target = re.sub("!.*","",e.source)
+        e.source = self.nickname
+        self.do_command(e)
 
     def on_pubmsg(self, c, e):
-        msg = e.arguments[0]
-        msg = msg.replace(':', ' ', 1)
-        msg = re.sub("[ \t]+", " ", msg).split(" ")
-        nick = msg[0]
-        if nick.lower() == self.connection.get_nickname().lower():
-            self.do_command(e, msg[1], *msg[2:])
-        return
+        # Double check nick
+        if c.get_nickname() != self.nickname:
+            self.nickname = c.get_nickname()
+
+        # Check msg is not from me and starts with my name
+        currNick = self.nickname
+        if e.source == self.nickname:
+            return
+
+        if(e.arguments[0].lower().startswith(self.nickname.lower())):
+            # Remove Name
+            e.arguments[0] = re.sub("^[\t:]*","",e.arguments[0][len(self.nickname):])
+            e.source = self.nickname
+            self.do_command(e)
 
     def on_dccmsg(self, c, e):
         c.privmsg("You said: " + e.arguments[0])
 
-    def do_command(self, e, cmd, *arg):
+    def do_command(self, e):
+        msg = e.arguments[0].strip().split(" ")
+        cmd = msg[0].lower()
+        arg = msg[1:]
+
+        #self.log.info("CMD [%s] %s" % (cmd, arg))
+
         if cmd == 'help':
             cmdStr = "commands: help " + " ".join(self.commands.keys())
             self.do_send(e.target, cmdStr)
