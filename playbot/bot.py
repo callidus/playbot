@@ -43,14 +43,6 @@ class PlayBot(irc.bot.SingleServerIRCBot):
         self.do_command(e)
 
     def on_pubmsg(self, c, e):
-        # Double check nick
-        if c.get_nickname() != self.nickname:
-            self.nickname = c.get_nickname()
-
-        # Check msg is not from me and starts with my name
-        if e.source == self.nickname:
-            return
-
         if(e.arguments[0].lower().startswith(self.nickname.lower())):
             # Remove Name
             e.arguments[0] = re.sub("^[\t:]*","",e.arguments[0][len(self.nickname):])
