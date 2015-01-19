@@ -48,7 +48,6 @@ class PlayBot(irc.bot.SingleServerIRCBot):
             self.nickname = c.get_nickname()
 
         # Check msg is not from me and starts with my name
-        currNick = self.nickname
         if e.source == self.nickname:
             return
 
@@ -65,8 +64,6 @@ class PlayBot(irc.bot.SingleServerIRCBot):
         msg = e.arguments[0].strip().split(" ")
         cmd = msg[0].lower()
         arg = msg[1:]
-
-        #self.log.info("CMD [%s] %s" % (cmd, arg))
 
         if cmd == 'help':
             cmdStr = "commands: help " + " ".join(self.commands.keys())
