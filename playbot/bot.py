@@ -39,14 +39,12 @@ class PlayBot(irc.bot.SingleServerIRCBot):
 
     def on_privmsg(self, c, e):
         e.target = re.sub("!.*","",e.source)
-        e.source = self.nickname
         self.do_command(e)
 
     def on_pubmsg(self, c, e):
         if(e.arguments[0].lower().startswith(self.nickname.lower())):
             # Remove Name
             e.arguments[0] = re.sub("^[\t:]*","",e.arguments[0][len(self.nickname):])
-            e.source = self.nickname
             self.do_command(e)
 
     def on_dccmsg(self, c, e):
@@ -69,7 +67,7 @@ class PlayBot(irc.bot.SingleServerIRCBot):
                 self.log.warn('Exception thrown from command: %s %s', str(cmd), err)
                 self.do_send(e.target, "Huh?")
         else:
-            nick = e.source
+            nick = re.sub("!.*","",e.source) # Strip IP from nick
             c = self.connection
             c.notice(nick, "Not understood: " + cmd)
 
