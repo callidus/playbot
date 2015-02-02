@@ -4,6 +4,7 @@ from plugins import say
 from plugins import control
 from plugins import CvH
 from plugins import fortune
+from plugins import card
 
 import logging
 
@@ -36,7 +37,10 @@ def main():
 
     sayer = say.Say()
     b.register_command('say', sayer)
-
+    
+    cardGame = card.Card()
+    b.register_command('card', cardGame)
+    
     b.start()
 
 if __name__ == "__main__":
