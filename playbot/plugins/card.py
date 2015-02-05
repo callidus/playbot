@@ -27,7 +27,7 @@ class Card:
     s = [u"\u2660",u"\u2663",u"\u2665",u"\u2666"] # SCHD
     v = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]
     if card:
-      if s < card[0]:
+      if card[0] < 2:
         return u"\u00031,0[" + s[card[0]] + v[card[1]] + u"]\u000F"
       else:
         return u"\u00034,0[" + s[card[0]] + v[card[1]] + u"]\u000F"
