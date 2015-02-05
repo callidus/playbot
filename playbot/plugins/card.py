@@ -10,8 +10,8 @@ class Card:
       self.currHands = {}
       self.dealer = bot.nickname
       self.handInProgress = False
-  
-  @staticmethod    
+
+  @staticmethod
   def getCardUnicode(card):
     uc = [[u"\U0001F0A1",u"\U0001F0A2",u"\U0001F0A3",u"\U0001F0A4",u"\U0001F0A5",u"\U0001F0A6",u"\U0001F0A7",u"\U0001F0A8",u"\U0001F0A9",u"\U0001F0AA",u"\U0001F0AB",u"\U0001F0AC",u"\U0001F0AD",u"\U0001F0AE"],
           [u"\U0001F0D1",u"\U0001F0D2",u"\U0001F0D3",u"\U0001F0D4",u"\U0001F0D5",u"\U0001F0D6",u"\U0001F0D7",u"\U0001F0D8",u"\U0001F0D9",u"\U0001F0DA",u"\U0001F0DB",u"\U0001F0DC",u"\U0001F0DD",u"\U0001F0DE"],
@@ -32,19 +32,20 @@ class Card:
       else:
         return u"\u00034,0[" + s[card[0]] + v[card[1]] + u"]\u000F"
     return "[#]"
-  
+
   @staticmethod
   def getHand(h):
     return "".join(map(Card.getCardUnicode,h)) + " " + "".join(map(Card.getCardAscii,h))
-    
+
   def newGame(self):
     self.deck = []
     self.hands = {}
     self.nicks = {}
+    self.nicks[self.dealer] = "call"
     self.handInProgress = True
     for i in range(4):
       for d in range(13):
-        self.deck.append([i,d]);
+        self.deck.append([i,d])
     random.shuffle(self.deck)
     self.hands[self.dealer] = [self.deck.pop(), self.deck.pop()]
 
