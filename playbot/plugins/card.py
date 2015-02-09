@@ -9,41 +9,43 @@ class Card:
       self.log = logging.getLogger(__name__)
       self.currHands = {}
       self.dealer = bot.nickname
-  
-  @staticmethod    
+      self.handInProgress = False
+
+  @staticmethod
   def getCardUnicode(card):
-    uc = [["\U0001F0A1","\U0001F0A2","\U0001F0A3","\U0001F0A4","\U0001F0A5","\U0001F0A6","\U0001F0A7","\U0001F0A8","\U0001F0A9","\U0001F0AA","\U0001F0AB","\U0001F0AC","\U0001F0AD","\U0001F0AE"],
-          ["\U0001F0D1","\U0001F0D2","\U0001F0D3","\U0001F0D4","\U0001F0D5","\U0001F0D6","\U0001F0D7","\U0001F0D8","\U0001F0D9","\U0001F0DA","\U0001F0DB","\U0001F0DC","\U0001F0DD","\U0001F0DE"],
-          ["\U0001F0B1","\U0001F0B2","\U0001F0B3","\U0001F0B4","\U0001F0B5","\U0001F0B6","\U0001F0B7","\U0001F0B8","\U0001F0B9","\U0001F0BA","\U0001F0BB","\U0001F0BC","\U0001F0BD","\U0001F0BE"],
-          ["\U0001F0C1","\U0001F0C2","\U0001F0C3","\U0001F0C4","\U0001F0C5","\U0001F0C6","\U0001F0C7","\U0001F0C8","\U0001F0C9","\U0001F0CA","\U0001F0CB","\U0001F0CC","\U0001F0CD","\U0001F0CE"],
-          ["\U0001F0A0","\U0001F0BF","\U0001F0CF","\U0001F0DF"]]
+    uc = [[u"\U0001F0A1",u"\U0001F0A2",u"\U0001F0A3",u"\U0001F0A4",u"\U0001F0A5",u"\U0001F0A6",u"\U0001F0A7",u"\U0001F0A8",u"\U0001F0A9",u"\U0001F0AA",u"\U0001F0AB",u"\U0001F0AC",u"\U0001F0AD",u"\U0001F0AE"],
+          [u"\U0001F0D1",u"\U0001F0D2",u"\U0001F0D3",u"\U0001F0D4",u"\U0001F0D5",u"\U0001F0D6",u"\U0001F0D7",u"\U0001F0D8",u"\U0001F0D9",u"\U0001F0DA",u"\U0001F0DB",u"\U0001F0DC",u"\U0001F0DD",u"\U0001F0DE"],
+          [u"\U0001F0B1",u"\U0001F0B2",u"\U0001F0B3",u"\U0001F0B4",u"\U0001F0B5",u"\U0001F0B6",u"\U0001F0B7",u"\U0001F0B8",u"\U0001F0B9",u"\U0001F0BA",u"\U0001F0BB",u"\U0001F0BC",u"\U0001F0BD",u"\U0001F0BE"],
+          [u"\U0001F0C1",u"\U0001F0C2",u"\U0001F0C3",u"\U0001F0C4",u"\U0001F0C5",u"\U0001F0C6",u"\U0001F0C7",u"\U0001F0C8",u"\U0001F0C9",u"\U0001F0CA",u"\U0001F0CB",u"\U0001F0CC",u"\U0001F0CD",u"\U0001F0CE"],
+          [u"\U0001F0A0",u"\U0001F0BF",u"\U0001F0CF",u"\U0001F0DF"]]
     if card:
       return uc[card[0]][card[1]]
     return uc[4][0]
 
   @staticmethod
   def getCardAscii(card):
-    s = ["\u2660","\u2663","\u2665","\u2666"] # SCHD
+    s = [u"\u2660",u"\u2663",u"\u2665",u"\u2666"] # SCHD
     v = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]
     if card:
-      if s < card[0]:
-        return "\u00031,0[" + s[card[0]] + v[card[1]] + "]\u000F"
+      if card[0] < 2:
+        return u"\u00031,0[" + s[card[0]] + v[card[1]] + u"]\u000F"
       else:
-        return "\u00034,0[" + s[card[0]] + v[card[1]] + "]\u000F"
+        return u"\u00034,0[" + s[card[0]] + v[card[1]] + u"]\u000F"
     return "[#]"
-  
+
   @staticmethod
   def getHand(h):
     return "".join(map(Card.getCardUnicode,h)) + " " + "".join(map(Card.getCardAscii,h))
-    
+
   def newGame(self):
     self.deck = []
     self.hands = {}
     self.nicks = {}
+    self.nicks[self.dealer] = "call"
     self.handInProgress = True
     for i in range(4):
       for d in range(13):
-        self.deck.append([i,d]);
+        self.deck.append([i,d])
     random.shuffle(self.deck)
     self.hands[self.dealer] = [self.deck.pop(), self.deck.pop()]
 
@@ -62,7 +64,7 @@ class Card:
     return x
 
   def __call__(self, bot, e, cmd, *arg):
-    if cmd == "new":
+    if arg[0] == "new":
       self.newGame()
       bot.do_send(e.target, "New Game")
       bot.do_send(e.target, "Dealer: " + Card.getHand([self.hands[self.dealer][0],False]))
@@ -72,7 +74,7 @@ class Card:
     if self.handInProgress is not True:
       return bot.do_send(nick, "Game not in progress")
 
-    if cmd == "deal":
+    if arg[0] == "deal":
       if nick in self.hands:
         return bot.do_send(nick, "Already dealt in.")
       h = [self.deck.pop(), self.deck.pop()]
@@ -88,7 +90,7 @@ class Card:
     if self.nicks[nick] != "dealt":
       return bot.do_send(nick, "Already Called")
 
-    if cmd == "hit":
+    if arg[0] == "hit":
       self.hands[self.dealer].append(self.deck.pop())
       h = self.hands[self.dealer]
       x = self.blackjackHandValue(h)
@@ -99,7 +101,7 @@ class Card:
       bot.do_send(nick, "Hand: %s = %d" % (Card.getHand(h), x))
       return
 
-    if cmd == "call":
+    if arg[0] == "call":
       self.nicks[nick] = "call"
 
       for p in self.nicks:
@@ -137,20 +139,20 @@ def test_all():
 
     b = Bot()
     c = Card(b)
-    c.__call__(b, E("jo"), "new")
-    c.__call__(b, E("jo"), "deal")
-    c.__call__(b, E("jo"), "hit")
+    c.__call__(b, E("jo"), "card", "new")
+    c.__call__(b, E("jo"), "card", "deal")
+    c.__call__(b, E("jo"), "card", "hit")
 
-    c.__call__(b, E("mi"), "deal")
+    c.__call__(b, E("mi"), "card", "deal")
 
-    c.__call__(b, E("slo"), "deal")
-    c.__call__(b, E("slo"), "hit")
-    c.__call__(b, E("slo"), "hit")
-    c.__call__(b, E("slo"), "hit")
-    c.__call__(b, E("slo"), "hit")
+    c.__call__(b, E("slo"), "card", "deal")
+    c.__call__(b, E("slo"), "card", "hit")
+    c.__call__(b, E("slo"), "card", "hit")
+    c.__call__(b, E("slo"), "card", "hit")
+    c.__call__(b, E("slo"), "card", "hit")
 
-    c.__call__(b, E("mi"), "call")
-    c.__call__(b, E("jo"), "call")
+    c.__call__(b, E("mi"), "card", "call")
+    c.__call__(b, E("jo"), "card", "call")
 
 if __name__ == "__main__":
     test_all()
