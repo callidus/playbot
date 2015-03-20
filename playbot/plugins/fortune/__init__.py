@@ -1,1 +1,1 @@
-import fortune
+from . import fortune

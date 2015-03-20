@@ -8,7 +8,7 @@ from plugins import card
 
 import logging
 
-name = "PlayBot"
+name = "Bot_KimDev"
 server = "irc.afternet.org"
 chans = ["""#pixelpit""",]
 port = 6697
@@ -38,7 +38,7 @@ def main():
     sayer = say.Say()
     b.register_command('say', sayer)
     
-    cardGame = card.Card()
+    cardGame = card.Card(b)
     b.register_command('card', cardGame)
     
     b.start()

@@ -3,6 +3,7 @@ import logging
 import ssl
 import time
 import re
+from plugins import linkpeek
 
 class PlayBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channels, nickname, password, server, port=6667,
@@ -46,6 +47,11 @@ class PlayBot(irc.bot.SingleServerIRCBot):
             # Remove Name
             e.arguments[0] = re.sub("^[\t:]*","",e.arguments[0][len(self.nickname):])
             self.do_command(e)
+
+        # Peek at any links
+        peek = linkpeek.peek(self, c, e)
+        if peek is not None:
+            self.do_send(e.target, "Link Title: " + peek.title)
 
     def on_dccmsg(self, c, e):
         c.privmsg("You said: " + e.arguments[0])

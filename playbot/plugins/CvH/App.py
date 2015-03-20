@@ -1,6 +1,6 @@
 import os
 import random
-import DataSource
+from . import DataSource
 
 class Phrase( object ):
     def __init__( self, data ):
