@@ -1,5 +1,6 @@
 import re
 import urllib.request
+import urllib.parse
 
 class PeekResponse: pass
 
@@ -19,7 +20,7 @@ def peek(bot, c, e):
 def peekTitle(url):
     req = urllib.request.Request(url)
     response = urllib.request.urlopen(req)
-    the_page = response.read()
+    the_page = response.read().decode('windows-1252')
     title = re.search("<title>([^<]*)</title>",str(the_page)).group(1)
     return title
 
