@@ -8,7 +8,7 @@ from plugins import card
 
 import logging
 
-name = "Bot_KimDev"
+name = "PlayBot"
 server = "irc.afternet.org"
 chans = ["""#pixelpit""",]
 port = 6697

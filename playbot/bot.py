@@ -49,6 +49,7 @@ class PlayBot(irc.bot.SingleServerIRCBot):
             self.do_command(e)
 
         # Peek at any links
+        # TODO :: Should be linked into PLUGIN arch
         peek = linkpeek.peek(self, c, e)
         if peek is not None:
             self.do_send(e.target, "Link Title: " + peek.title)
