@@ -38,7 +38,7 @@ def main():
     sayer = say.Say()
     b.register_command('say', sayer)
     
-    cardGame = card.Card()
+    cardGame = card.Card(b)
     b.register_command('card', cardGame)
     
     b.start()

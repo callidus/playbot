@@ -1,4 +1,4 @@
-import data_source
+from . import data_source
 import random
 import logging
 import os
