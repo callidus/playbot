@@ -1,20 +1,22 @@
 import bot
-from plugins import dice
-from plugins import say
+from plugins import card
 from plugins import control
 from plugins import CvH
+from plugins import dice
 from plugins import fortune
-from plugins import card
+from plugins import say
 
 import logging
 
 name = "PlayBot"
 server = "irc.afternet.org"
-chans = ["""#pixelpit""",]
+chans = ["""#pixelpit""", ]
 port = 6697
+
 
 def setup_logging():
     logging.basicConfig(level=logging.INFO)
+
 
 def main():
     setup_logging()
@@ -37,10 +39,10 @@ def main():
 
     sayer = say.Say()
     b.register_command('say', sayer)
-    
+
     cardGame = card.Card(b)
     b.register_command('card', cardGame)
-    
+
     b.start()
 
 if __name__ == "__main__":

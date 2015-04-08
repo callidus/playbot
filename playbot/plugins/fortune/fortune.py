@@ -1,7 +1,9 @@
-from . import data_source
-import random
+import data_source
+
 import logging
 import os
+import random
+
 
 class Fortune(object):
     def __init__(self, db, prefix=None):
@@ -13,9 +15,9 @@ class Fortune(object):
 
         self.maxIdx = self.data.getCount()-1
         self.prefix = prefix
- 
+
         self.log = logging.getLogger(__name__)
-        self.log.info("Fortune loaded db: %s with %i entries.", 
+        self.log.info("Fortune loaded db: %s with %i entries.",
                       db, self.maxIdx)
 
     def __call__(self, bot, e, cmd, *args):

@@ -21,6 +21,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+*.eggs
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -37,8 +38,10 @@ htmlcov/
 .tox/
 .coverage
 .cache
+.testrepository
 nosetests.xml
 coverage.xml
+cover/
 
 # Translations
 *.mo

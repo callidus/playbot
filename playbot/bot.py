@@ -1,26 +1,31 @@
 import irc.bot
+
 import logging
+import re
 import ssl
 import time
-import re
-from plugins import linkpeek
+
 
 class PlayBot(irc.bot.SingleServerIRCBot):
     def __init__(self, channels, nickname, password, server, port=6667,
                  force_ssl=False, server_password=None):
         if force_ssl or port == 6697:
             factory = irc.connection.Factory(wrapper=ssl.wrap_socket)
-            super(PlayBot, self).__init__([(server, port, server_password)],
-                                            nickname, nickname,
-                                            connect_factory=factory)
+            super(PlayBot, self).__init__(
+                [(server, port, server_password)],
+                nickname, nickname,
+                connect_factory=factory)
         else:
-            super(PlayBot, self).__init__([(server, port, server_password)],
-                                            nickname, nickname)
+            super(PlayBot, self).__init__(
+                [(server, port, server_password)],
+                nickname, nickname)
+
         self.commands = {}
+        self.listeners = []
         self.channel_list = channels
         self.nickname = nickname
         self.password = password
-        self.log = logging.getLogger('playbot')
+        self.log = logging.getLogger(self.__name__)
 
     def register_command(self, name, obj):
         self.commands[name] = obj
@@ -39,20 +44,18 @@ class PlayBot(irc.bot.SingleServerIRCBot):
             time.sleep(0.5)
 
     def on_privmsg(self, c, e):
-        e.target = re.sub("!.*","",e.source)
+        e.target = re.sub("!.*", "", e.source)
         self.do_command(e)
 
     def on_pubmsg(self, c, e):
         if(e.arguments[0].lower().startswith(self.nickname.lower())):
             # Remove Name
-            e.arguments[0] = re.sub("^[\t:]*","",e.arguments[0][len(self.nickname):])
+            e.arguments[0] = re.sub("^[\t:]*", "",
+                                    e.arguments[0][len(self.nickname):])
             self.do_command(e)
 
-        # Peek at any links
-        # TODO :: Should be linked into PLUGIN arch
-        peek = linkpeek.peek(self, c, e)
-        if peek is not None:
-            self.do_send(e.target, "Link Title: " + peek.title)
+        for listener in self.listeners:
+            listener(self, c, e)
 
     def on_dccmsg(self, c, e):
         c.privmsg("You said: " + e.arguments[0])
@@ -71,10 +74,11 @@ class PlayBot(irc.bot.SingleServerIRCBot):
             try:
                 c(self, e, cmd, *arg)
             except Exception as err:
-                self.log.warn('Exception thrown from command: %s %s', str(cmd), err)
+                self.log.warn('Exception thrown from command: %s %s', str(cmd),
+                              err)
                 self.do_send(e.target, "Huh?")
         else:
-            nick = re.sub("!.*","",e.source) # Strip IP from nick
+            nick = re.sub("!.*", "", e.source)  # Strip IP from nick
             c = self.connection
             c.notice(nick, "Not understood: " + cmd)
 
@@ -86,5 +90,3 @@ class PlayBot(irc.bot.SingleServerIRCBot):
         except Exception:
             self.log.exception('Exception sending message:')
             self.reconnect()
-
-

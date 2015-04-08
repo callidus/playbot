@@ -1,6 +1,7 @@
 import logging
 
-class Say:
+
+class Say(object):
     def __init__(self):
         self.log = logging.getLogger(__name__)
 
@@ -10,6 +11,6 @@ class Say:
             msg = "say what?"
         else:
             msg = " ".join(arg)
-        
+
         self.log.info("Saying: '%s'", msg)
         bot.do_send(e.target, msg)

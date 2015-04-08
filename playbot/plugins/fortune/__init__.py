@@ -1,1 +1,1 @@
-from . import fortune
+import fortune  # noqa

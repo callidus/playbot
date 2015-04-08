@@ -1,5 +1,6 @@
-import random
 import logging
+import random
+
 
 class Dice:
     def __init__(self):
@@ -21,14 +22,14 @@ class Dice:
                 max, mod = max.split('+')
                 mod = int(mod)
 
-            for i in range(0,int(num)):
-                r = random.randint(1,int(max))
+            for i in range(0, int(num)):
+                r = random.randint(1, int(max))
                 val.append(r)
 
             val.sort()
             msg = "%s = %i [%s]" % (
-                arg[0], 
-                sum(val)+mod, 
+                arg[0],
+                sum(val)+mod,
                 " ".join([str(v) for v in val]))
 
         bot.do_send(e.target, msg)
