@@ -1,16 +1,20 @@
-import bot
-from plugins import card
-from plugins import control
-from plugins import CvH
-from plugins import dice
-from plugins import fortune
-from plugins import say
+
+from __future__ import absolute_import
+
+from playbot import bot
+from playbot.plugins import card
+from playbot.plugins import control
+from playbot.plugins import CvH
+from playbot.plugins import dice
+from playbot.plugins import fortune
+from playbot.plugins import say
+from playbot.plugins import link_peek
 
 import logging
 
 name = "PlayBot"
 server = "irc.afternet.org"
-chans = ["""#pixelpit""", ]
+chans = ["""#testroom""", ]
 port = 6697
 
 
@@ -40,8 +44,10 @@ def main():
     sayer = say.Say()
     b.register_command('say', sayer)
 
-    cardGame = card.Card(b)
-    b.register_command('card', cardGame)
+    #cardGame = card.Card(b)
+    #b.register_command('card', cardGame)
+
+    b.register_listner(link_peek.peek)
 
     b.start()
 

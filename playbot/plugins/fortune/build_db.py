@@ -1,15 +1,19 @@
+
+from __future__ import absolute_import
+from __future__ import print_function
+
 import os
 import re
 import sys
 
-import data_source
-from future import print_function  # noqa
+from playbot.plugins.fortune import data_source
+
 
 db = data_source.DataSource()
 if os.path.isfile(sys.argv[1]):
-    db.openDB(sys.argv[1])
+    db.open_db(sys.argv[1])
 else:
-    db.buildDB(sys.argv[1])
+    db.build_db(sys.argv[1])
 
 with open(sys.argv[2], 'r') as f:
     data = f.read()
@@ -20,7 +24,7 @@ with open(sys.argv[2], 'r') as f:
             item = re.sub("[ \t]+", " ", item)
             print(key, item)
             try:
-                db.addFortune(unicode(item, 'utf-8'))
+                db.add_fortune(unicode(item, 'utf-8'))
                 print("... OK")
             except Exception as e:
                 print("... Fail", e)
