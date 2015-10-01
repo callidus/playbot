@@ -1,9 +1,15 @@
+
+from __future__ import absolute_import
+from __future__ import print_function
+
 import irc.bot
 
 import logging
 import re
 import ssl
 import time
+
+logger = logging.getLogger(__name__)
 
 
 class PlayBot(irc.bot.SingleServerIRCBot):
@@ -25,22 +31,24 @@ class PlayBot(irc.bot.SingleServerIRCBot):
         self.channel_list = channels
         self.nickname = nickname
         self.password = password
-        self.log = logging.getLogger(self.__name__)
 
     def register_command(self, name, obj):
         self.commands[name] = obj
 
+    def register_listner(self, obj):
+        self.listeners.append(obj)
+
     def on_nicknameinuse(self, c, e):
-        self.log.info('Nick previously in use, recovering.')
+        logger.info('Nick previously in use, recovering.')
         self.nickname = c.get_nickname() + "_"
         c.nick(self.nickname)
         time.sleep(1)
-        self.log.info('Nick previously in use, recovered.')
+        logger.info('Nick previously in use, recovered.')
 
     def on_welcome(self, c, e):
         for channel in self.channel_list:
             c.join(channel)
-            self.log.info('Joined channel %s' % channel)
+            logger.info('Joined channel %s' % channel)
             time.sleep(0.5)
 
     def on_privmsg(self, c, e):
@@ -54,8 +62,15 @@ class PlayBot(irc.bot.SingleServerIRCBot):
                                     e.arguments[0][len(self.nickname):])
             self.do_command(e)
 
-        for listener in self.listeners:
-            listener(self, c, e)
+        else:
+            try:
+                for listener in self.listeners:
+                    msg = listener(self, c, e)
+                    if msg is not None:
+                        self.do_send(e.target, msg)
+
+            except Exception as err:
+                logger.warn('Error in listener: %s', err)
 
     def on_dccmsg(self, c, e):
         c.privmsg("You said: " + e.arguments[0])
@@ -74,8 +89,7 @@ class PlayBot(irc.bot.SingleServerIRCBot):
             try:
                 c(self, e, cmd, *arg)
             except Exception as err:
-                self.log.warn('Exception thrown from command: %s %s', str(cmd),
-                              err)
+                logger.warn('Error in command: %s %s', str(cmd), err)
                 self.do_send(e.target, "Huh?")
         else:
             nick = re.sub("!.*", "", e.source)  # Strip IP from nick
@@ -83,10 +97,10 @@ class PlayBot(irc.bot.SingleServerIRCBot):
             c.notice(nick, "Not understood: " + cmd)
 
     def do_send(self, channel, msg):
-        self.log.info('Sending "%s" to %s' % (msg, channel))
+        logger.info('Sending "%s" to %s' % (msg, channel))
         try:
             self.connection.privmsg(channel, msg)
             time.sleep(0.5)
         except Exception:
-            self.log.exception('Exception sending message:')
+            logger.exception('Exception sending message:')
             self.reconnect()

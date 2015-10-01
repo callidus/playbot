@@ -1,4 +1,6 @@
 
+from __future__ import absolute_import
+
 import sqlite3 as dbapi
 
 
@@ -10,11 +12,11 @@ class DataSource(object):
         if self.conn:
             self.conn.close()
 
-    def openDB(self, name):
+    def open_db(self, name):
         """open an existing database."""
         self.conn = dbapi.connect(name)
 
-    def buildDB(self, name):
+    def build_db(self, name):
         """build a new database to use."""
         self.conn = dbapi.connect(name)
         try:
@@ -27,13 +29,13 @@ class DataSource(object):
             self.conn.rollback()
             raise
 
-    def getCount(self):
+    def get_count(self):
         sql = 'SELECT Count(*) FROM fortune'
         c = self.conn.cursor()
         c.execute(sql)
         return c.fetchone()[0]
 
-    def addFortune(self, data):
+    def add_fortune(self, data):
         c = self.conn.cursor()
         sql = 'INSERT INTO fortune (data) VALUES (?)'
         try:
@@ -46,7 +48,7 @@ class DataSource(object):
             self.conn.rollback()
             raise
 
-    def delCard(self, itemId):
+    def del_fortune(self, itemId):
         c = self.conn.cursor()
         sql = 'DELETE FROM fortune WHERE id=?'
 
@@ -58,13 +60,13 @@ class DataSource(object):
             self.conn.rollback()
             raise
 
-    def getFortunes(self):
+    def get_fortunes(self):
         sql = 'SELECT id, data FROM fortune'
         c = self.conn.cursor()
         c.execute(sql)
         return c.fetchall()
 
-    def getFortune(self, id):
+    def get_fortune(self, id):
         sql = 'SELECT data FROM fortune WHERE id=?'
         c = self.conn.cursor()
         c.execute(sql, (id,))
